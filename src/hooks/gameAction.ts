@@ -42,9 +42,7 @@ export const handleCheck = (
     const board = state.board
     const { isWinning, winningPath } = checkWinner(board, action.payload.lastMove, setting.winningCondition)
 
-    if (isWinning) {
-      return { ...state, isGameOver: true, winningPath }
-    }
+    if (isWinning) return { ...state, isGameOver: true, winningPath }
 
     const isPlayable = checkPlayable(board)
     if (!isPlayable) return { ...state, isGameOver: true }
