@@ -12,7 +12,7 @@ export const initGameState = (setting: Setting): GameState => {
     isX: true,
     isGameOver: false,
     lastMove: null,
-    winningPath: [],
+    winningPath: null,
   }
 }
 
