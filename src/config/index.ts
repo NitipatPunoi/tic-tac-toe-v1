@@ -1,0 +1,3 @@
+import { SETTING_STORAGE_KEY, DEFAULT_SETTING } from './config'
+
+export { SETTING_STORAGE_KEY, DEFAULT_SETTING }
