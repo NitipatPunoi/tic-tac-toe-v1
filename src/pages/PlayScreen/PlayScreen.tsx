@@ -1,4 +1,4 @@
-// import { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Board } from './../../components/Board'
 import { Button } from './../../components/UIElement'
@@ -9,6 +9,10 @@ import { useGameReducer } from '../../hooks'
 const PlayScreen = () => {
   const { setting } = useSettingContext()
   const { state, dispatch } = useGameReducer(setting)
+
+  useEffect(() => {
+    dispatch({ type: ActionType.Reset, payload: { setting } })
+  }, [setting])
 
   const handleClick = (row: number, col: number) => {
     if (!state.isGameOver && !state.board[row][col]) {
