@@ -1,18 +1,31 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Board } from './../../components/Board'
 import { Button } from './../../components/UIElement'
 import { useSettingContext } from '../../contexts'
 import { ActionType } from './../../types'
 import { useGameReducer } from '../../hooks'
+import { Modal } from '../../components/UIElement/Modal'
 
 const PlayScreen = () => {
   const { setting } = useSettingContext()
   const { state, dispatch } = useGameReducer(setting)
+  const [isModalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
     handleReset()
   }, [setting])
+
+  useEffect(() => {
+    if (state.isGameOver) {
+      setModalOpen(true)
+    }
+  }, [state.isGameOver])
+
+  const handleCloseModal = () => {
+    setModalOpen(false)
+    handleReset()
+  }
 
   const handleClick = (row: number, col: number) => {
     if (!state.isGameOver && !state.board[row][col]) {
@@ -58,6 +71,17 @@ const PlayScreen = () => {
           <Button text="Back to Main Menu" />
         </Link>
       </div>
+
+      {/* แสดง Modal เมื่อเกมจบ */}
+      <Modal open={isModalOpen} onClose={handleCloseModal}>
+        <div>
+          <h2 className="text-3xl font-bold">Game Over!</h2>
+          <p className="mt-4">Would you like to reset the game?</p>
+          <div className="mt-4 flex justify-around">
+            <Button text="Close" onClick={handleCloseModal} />
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
