@@ -1,34 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
+import { HomeScreen, PlayScreen, SettingScreen, CreditScreen } from './pages'
+import { Header, Footer } from './components/layouts'
+import './assets/global.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const location = useLocation()
+
+  const page = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+    transition: {
+      duration: 0.3,
+      ease: 'easeInOut',
+    },
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="grid grid-rows-[1fr_18fr_1fr] h-screen min-h-fit bg-primary font-pressStart text-xs">
+      <Header />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          initial={page.initial}
+          animate={page.animate}
+          exit={page.exit}
+          transition={page.transition}
+        >
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<HomeScreen />} />
+            <Route path="/play" element={<PlayScreen />} />
+            <Route path="/settings" element={<SettingScreen />} />
+            <Route path="/credits" element={<CreditScreen />} />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
+      <Footer />
+    </div>
   )
 }
 
