@@ -11,7 +11,7 @@ const PlayScreen = () => {
   const { state, dispatch } = useGameReducer(setting)
 
   useEffect(() => {
-    dispatch({ type: ActionType.Reset, payload: { setting } })
+    handleReset()
   }, [setting])
 
   const handleClick = (row: number, col: number) => {
@@ -32,7 +32,7 @@ const PlayScreen = () => {
     }
   }
 
-  const handleResetGame = () => {
+  const handleReset = () => {
     dispatch({ type: ActionType.Reset, payload: { setting } })
   }
 
@@ -53,7 +53,7 @@ const PlayScreen = () => {
         <Board board={state.board} lastMove={state.lastMove} winningPath={state.winningPath} onClick={handleClick} />
       </div>
       <div className="grid grid-rows gap-6 w-2/3 md:w-1/2 lg:w-1/3 h-full mx-auto px-0 sm:px-5 md:px-10 py-10 text-center">
-        <Button text="Reset" onClick={handleResetGame} />
+        <Button text="Reset" onClick={handleReset} />
         <Link to="/" className="text-nowrap">
           <Button text="Back to Main Menu" />
         </Link>
