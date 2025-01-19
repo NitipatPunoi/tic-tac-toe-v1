@@ -3,12 +3,13 @@ import { Move } from '../types'
 type BoardProps = {
   board: string[][]
   lastMove: Move | null
-  winningPath: Move[]
+  winningPath: Move[] | null
   onClick: (rowIndex: number, colIndex: number) => void
 }
 
 export const Board: React.FC<BoardProps> = ({ board, lastMove, winningPath, onClick }) => {
-  const isWinningPath = (row: number, col: number) => winningPath.some((pos) => pos.row === row && pos.col === col)
+  const isWinningPath = (row: number, col: number) =>
+    winningPath !== null && winningPath.some((pos) => pos.row === row && pos.col === col)
   return (
     <div className="board select-none">
       {board.map((row, rowIndex) => (
