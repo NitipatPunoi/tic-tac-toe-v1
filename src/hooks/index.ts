@@ -1,3 +1,3 @@
-import { useGameState } from './useGameState'
+import { useGameReducer } from './useGameReducer'
 
-export { useGameState }
+export { useGameReducer }

@@ -10,20 +10,23 @@ export type GameState = {
   turn: number
   isX: boolean
   isGameOver: boolean
-  move: Move | null
-  winningPath: Move[]
+  lastMove: Move | null
+  winningPath: Move[] | null
 }
 
 export enum ActionType {
   Reset = 'RESET',
   Move = 'MOVE',
-  GameOver = 'GAME_OVER',
-  NextTurn = 'NEXT_TURN',
+  Check = 'CHECK',
+  Next = 'NEXT',
+  End = 'END',
 }
+export type Action<ActionType extends string, Payload = undefined> = Payload extends undefined
+  ? { type: ActionType }
+  : { type: ActionType; payload: Payload }
 
-export type ActionReset = { type: ActionType.Reset; setting: Setting }
-export type ActionMove = { type: ActionType.Move; move: Move; isX: boolean }
-export type ActionGameOver = { type: ActionType.GameOver; winningPath: Move[] }
-export type ActionNextTurn = { type: ActionType.NextTurn }
-
-export type GameAction = ActionReset | ActionMove | ActionGameOver | ActionNextTurn
+export type GameAction =
+  | Action<ActionType.Reset, { setting: Setting }>
+  | Action<ActionType.Move, { lastMove: Move; isX: boolean }>
+  | Action<ActionType.Check, { setting: Setting; lastMove: Move }>
+  | Action<ActionType.Next>

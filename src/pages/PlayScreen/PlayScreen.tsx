@@ -1,22 +1,36 @@
-import { useEffect } from 'react'
+// import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Board } from './../../components/Board'
 import { Button } from './../../components/UIElement'
-import { useGameState } from './../../hooks/useGameState'
-import { Move } from './../../types'
+import { useSettingContext } from '../../contexts'
+import { ActionType } from './../../types'
+import { useGameReducer } from '../../hooks'
 
 const PlayScreen = () => {
-  const { gameState, handleResetGame, handleMove } = useGameState()
+  const { setting } = useSettingContext()
+  const { state, dispatch } = useGameReducer(setting)
 
-  const handleClick = (rowIndex: number, colIndex: number) => {
-    const move: Move = { row: rowIndex, col: colIndex }
-    !gameState.isGameOver && handleMove(move, gameState.isX)
+  const handleClick = (row: number, col: number) => {
+    if (!state.isGameOver && !state.board[row][col]) {
+      dispatch({
+        type: ActionType.Move,
+        payload: { lastMove: { row, col }, isX: state.isX },
+      })
+
+      dispatch({
+        type: ActionType.Check,
+        payload: { setting, lastMove: { row, col } },
+      })
+
+      if (!state.isGameOver) {
+        dispatch({ type: ActionType.Next })
+      }
+    }
   }
 
-  useEffect(() => {
-    gameState.isGameOver && gameState.winningPath.length > 0 && alert(`${gameState.isX ? 'X' : 'O'} wins!`)
-    gameState.isGameOver && gameState.winningPath.length == 0 && alert('isDraw')
-  }, [gameState.isGameOver, gameState.winningPath])
+  const handleResetGame = () => {
+    dispatch({ type: ActionType.Reset, payload: { setting } })
+  }
 
   return (
     <div>
@@ -26,18 +40,13 @@ const PlayScreen = () => {
       </div>
       <div className="w-fit mx-auto">
         <div className="flex flex-row justify-between">
-          <span>turn {`${gameState.turn}`}</span>
+          <span>turn {`${state.turn}`}</span>
           <span>
-            <span className={`${gameState.isX ? 'x-mark' : 'o-mark'} px-1`}>{`${gameState.isX ? 'X' : 'O'}`}</span>
+            <span className={`${state.isX ? 'x-mark' : 'o-mark'} px-1`}>{`${state.isX ? 'X' : 'O'}`}</span>
             play
           </span>
         </div>
-        <Board
-          board={gameState.board}
-          lastMove={gameState.move}
-          winningPath={gameState.winningPath}
-          onClick={handleClick}
-        />
+        <Board board={state.board} lastMove={state.lastMove} winningPath={state.winningPath} onClick={handleClick} />
       </div>
       <div className="grid grid-rows gap-6 w-2/3 md:w-1/2 lg:w-1/3 h-full mx-auto px-0 sm:px-5 md:px-10 py-10 text-center">
         <Button text="Reset" onClick={handleResetGame} />

@@ -17,10 +17,10 @@ const traceDirection = (
   mark: string
 ): { count: number; positions: Move[] } => {
   const positions: Move[] = []
-  const rowsLength = board.length
-  const colsLength = board[0].length
+  const rowsBounds = board.length
+  const colsBounds = board[0].length
   let count = 0
-  while (isInBounds(row, col, rowsLength, colsLength) && board[row][col] === mark) {
+  while (isInBounds(row, col, rowsBounds, colsBounds) && board[row][col] === mark) {
     positions.push({ row, col })
     row += dr
     col += dc
@@ -29,17 +29,17 @@ const traceDirection = (
   return { count, positions }
 }
 
-export const hasGameEnded = (
+export const checkWinner = (
   board: string[][],
-  move: Move,
-  winCondition: number
+  lastMove: Move,
+  winningCondition: number
 ): {
-  isGameOver: boolean
-  winningPath: Move[]
+  isWinning: boolean
+  winningPath: Move[] | null
 } => {
-  const { row, col } = move
+  const { row, col } = lastMove
   const mark = board[row][col]
-  if (!mark) return { isGameOver: false, winningPath: [] }
+  if (!mark) return { isWinning: false, winningPath: null }
 
   for (const { dr, dc } of directions) {
     const forward = traceDirection(board, row, col, dr, dc, mark)
@@ -48,15 +48,10 @@ export const hasGameEnded = (
     const totalCount = forward.count + backward.count
     const winningPath = [...forward.positions, ...backward.positions]
 
-    if (totalCount >= winCondition) {
-      return { isGameOver: true, winningPath }
+    if (totalCount >= winningCondition) {
+      return { isWinning: true, winningPath }
     }
   }
 
-  const isDraw = board.every((row) => row.every((cell) => cell !== null))
-  if (isDraw) {
-    return { isGameOver: true, winningPath: [] }
-  }
-
-  return { isGameOver: false, winningPath: [] }
+  return { isWinning: false, winningPath: null }
 }
