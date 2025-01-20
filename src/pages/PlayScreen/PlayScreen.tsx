@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Board } from './../../components/Board'
-import { Button } from './../../components/UIElement'
+import { Button, Modal } from './../../components/UIElement'
 import { useSettingContext } from '../../contexts'
-import { ActionType } from './../../types'
 import { useGameReducer } from '../../hooks'
-import { Modal } from '../../components/UIElement/Modal'
+import { Move, ActionType } from './../../types'
 
 const PlayScreen = () => {
   const { setting } = useSettingContext()
@@ -17,10 +16,10 @@ const PlayScreen = () => {
   }, [setting])
 
   useEffect(() => {
-    if (state.isGameOver) {
+    if (state.play.isGameOver) {
       setModalOpen(true)
     }
-  }, [state.isGameOver])
+  }, [state.play.isGameOver])
 
   const handleCloseModal = () => {
     setModalOpen(false)
@@ -28,18 +27,19 @@ const PlayScreen = () => {
   }
 
   const handleClick = (row: number, col: number) => {
-    if (!state.isGameOver && !state.board[row][col]) {
+    const move: Move = { row, col }
+    if (!state.play.isGameOver && !state.board[row][col]) {
       dispatch({
         type: ActionType.Move,
-        payload: { lastMove: { row, col }, isX: state.isX },
+        payload: { move, isX: state.play.isX },
       })
 
       dispatch({
         type: ActionType.Check,
-        payload: { setting, lastMove: { row, col } },
+        payload: { setting, move },
       })
 
-      if (!state.isGameOver) {
+      if (!state.play.isGameOver) {
         dispatch({ type: ActionType.Next })
       }
     }
@@ -57,13 +57,18 @@ const PlayScreen = () => {
       </div>
       <div className="w-fit mx-auto">
         <div className="flex flex-row justify-between">
-          <span>turn {`${state.turn}`}</span>
+          <span>turn {`${state.play.turn}`}</span>
           <span>
-            <span className={`${state.isX ? 'x-mark' : 'o-mark'} px-1`}>{`${state.isX ? 'X' : 'O'}`}</span>
+            <span className={`${state.play.isX ? 'x-mark' : 'o-mark'} px-1`}>{`${state.play.isX ? 'X' : 'O'}`}</span>
             play
           </span>
         </div>
-        <Board board={state.board} lastMove={state.lastMove} winningPath={state.winningPath} onClick={handleClick} />
+        <Board
+          board={state.board}
+          lastMove={state.play.move}
+          winningPath={state.play.winningPath}
+          onClick={handleClick}
+        />
       </div>
       <div className="grid grid-rows gap-6 w-2/3 md:w-1/2 lg:w-1/3 h-full mx-auto px-0 sm:px-5 md:px-10 py-10 text-center">
         <Button text="Reset" onClick={handleReset} />
@@ -72,11 +77,10 @@ const PlayScreen = () => {
         </Link>
       </div>
 
-      {/* แสดง Modal เมื่อเกมจบ */}
       <Modal open={isModalOpen} onClose={handleCloseModal}>
         <div>
           <h2 className="text-3xl font-bold">Game Over!</h2>
-          <p className="mt-4">Would you like to reset the game?</p>
+          <p className="mt-4">win is {`${state.play.isX ? 'X' : 'O'}`}</p>
           <div className="mt-4 flex justify-around">
             <Button text="Close" onClick={handleCloseModal} />
           </div>
