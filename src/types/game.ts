@@ -27,14 +27,18 @@ export enum ActionType {
   Move = 'MOVE',
   Check = 'CHECK',
   Next = 'NEXT',
+  MoveCheck = 'MoveCheck',
 }
 
 export type Action<ActionType extends string, Payload = undefined> = Payload extends undefined
   ? { type: ActionType }
   : { type: ActionType; payload: Payload }
 
+export type ActionPayload = { setting: Setting | null; move: Move | null; isX: boolean | null }
+
 export type GameAction =
-  | Action<ActionType.Reset, { setting: Setting }>
-  | Action<ActionType.Move, { move: Move; isX: boolean }>
-  | Action<ActionType.Check, { setting: Setting; move: Move }>
+  | Action<ActionType.Reset, ActionPayload>
+  | Action<ActionType.Move, ActionPayload>
+  | Action<ActionType.Check, ActionPayload>
   | Action<ActionType.Next>
+  | Action<ActionType.MoveCheck, ActionPayload>
