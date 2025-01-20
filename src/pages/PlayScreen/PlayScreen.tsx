@@ -1,15 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Board } from './../../components/Board'
 import { Button, Modal } from './../../components/UIElement'
 import { useSettingContext } from '../../contexts'
 import { useGameReducer } from '../../hooks'
 import { Move, ActionType } from './../../types'
+import { flushSync } from 'react-dom'
 
 const PlayScreen = () => {
   const { setting } = useSettingContext()
   const { state, dispatch } = useGameReducer(setting)
   const [isModalOpen, setModalOpen] = useState(false)
+  const stateRef = useRef(state)
+
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
 
   useEffect(() => {
     handleReset()
@@ -29,17 +35,21 @@ const PlayScreen = () => {
   const handleClick = (row: number, col: number) => {
     const move: Move = { row, col }
     if (!state.play.isGameOver && !state.board[row][col]) {
-      dispatch({
-        type: ActionType.Move,
-        payload: { move, isX: state.play.isX },
+      flushSync(() => {
+        dispatch({
+          type: ActionType.Move,
+          payload: { move, isX: state.play.isX },
+        })
       })
 
-      dispatch({
-        type: ActionType.Check,
-        payload: { setting, move },
+      flushSync(() => {
+        dispatch({
+          type: ActionType.Check,
+          payload: { setting, move },
+        })
       })
 
-      if (!state.play.isGameOver) {
+      if (!stateRef.current.play.isGameOver) {
         dispatch({ type: ActionType.Next })
       }
     }
