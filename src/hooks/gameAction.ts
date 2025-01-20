@@ -25,8 +25,8 @@ export const handleMove = (
   action: Action<ActionType.Move, { move: Move; isX: boolean }>
 ): GameState => {
   const { move, isX } = action.payload
-  const board = state.board.map((row, rIdx) =>
-    rIdx === move.row ? row.map((col, cIdx) => (cIdx === move.col ? (isX ? 'X' : 'O') : col)) : row
+  const board = state.board.map((boardRow, row) =>
+    row === move.row ? boardRow.map((cell, col) => (col === move.col ? (isX ? 'X' : 'O') : cell)) : boardRow
   )
   return { ...state, board, play: { ...state.play, move } }
 }
