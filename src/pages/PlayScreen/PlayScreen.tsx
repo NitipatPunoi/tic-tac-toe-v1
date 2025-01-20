@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Board } from './../../components/Board'
 import { Button, Modal } from './../../components/UIElement'
-import { useSettingContext, useGameModeContext } from '../../contexts'
-import { useGameReducer } from '../../hooks'
+import { useSettingContext, useGameModeContext } from './../../contexts'
+import { useGameReducer } from './../../hooks'
 import { Move, ActionType, GameModeType } from './../../types'
+import { makeDecision } from '../../utils'
 
 const PlayScreen = () => {
   const { gameMode } = useGameModeContext()
@@ -56,29 +57,9 @@ const PlayScreen = () => {
     setModalOpen(false)
   }
 
-  const getRandomMove = (): { row: number; col: number } | null => {
-    const availableMoves: { row: number; col: number }[] = []
-
-    state.board.forEach((boardRow, row) => {
-      boardRow.forEach((cell, col) => {
-        if (cell === null) {
-          availableMoves.push({ row, col })
-        }
-      })
-    })
-
-    if (availableMoves.length === 0) {
-      return null
-    }
-
-    const randomIndex = Math.floor(Math.random() * availableMoves.length)
-    return availableMoves[randomIndex]
-  }
-
   if (isBotPlay) {
-    // Bot Make Decision
-    const randMove = getRandomMove()
-    if (randMove !== null) handleMove(randMove.row, randMove.col)
+    const botDecision = makeDecision(state)
+    handleMove(botDecision.row, botDecision.col)
   }
 
   return (
