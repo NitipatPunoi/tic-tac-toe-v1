@@ -1,57 +1,57 @@
-import { Move, GameState, Action, ActionType, Setting } from '../types'
+import { Move, PlayState, GameState, Action, ActionType, Setting } from '../types'
 import { checkWinner, checkPlayable } from '../utils'
 
 export const initGameState = (setting: Setting): GameState => {
-  const initBoard = Array(setting.boardSize.rows)
+  const board = Array(setting.boardSize.rows)
     .fill(null)
     .map(() => Array(setting.boardSize.cols).fill(null))
 
-  return {
-    board: initBoard,
+  const play: PlayState = {
     turn: 1,
     isX: true,
     isGameOver: false,
-    lastMove: null,
+    move: null,
     winningPath: null,
   }
+
+  return { setting, board, play, logs: null }
 }
 
-export const handleReset = (action: Action<ActionType.Reset, { setting: Setting }>): GameState => {
-  const setting = action.payload.setting
-  return initGameState(setting)
-}
+export const handleReset = (action: Action<ActionType.Reset, { setting: Setting }>): GameState =>
+  initGameState(action.payload.setting)
 
 export const handleMove = (
   state: GameState,
-  action: Action<ActionType.Move, { lastMove: Move; isX: boolean }>
+  action: Action<ActionType.Move, { move: Move; isX: boolean }>
 ): GameState => {
-  const { lastMove, isX } = action.payload
+  const { move, isX } = action.payload
   const board = state.board.map((row, rIdx) =>
-    rIdx === lastMove.row ? row.map((col, cIdx) => (cIdx === lastMove.col ? (isX ? 'X' : 'O') : col)) : row
+    rIdx === move.row ? row.map((col, cIdx) => (cIdx === move.col ? (isX ? 'X' : 'O') : col)) : row
   )
-  return { ...state, board, lastMove }
+  return { ...state, board, play: { ...state.play, move } }
 }
 
 export const handleCheck = (
   state: GameState,
-  action: Action<ActionType.Check, { setting: Setting; lastMove: Move }>
+  action: Action<ActionType.Check, { setting: Setting; move: Move }>
 ): GameState => {
   const setting = action.payload.setting
   const checkThreshold = 2 * setting.winningCondition - 1
-  if (state.turn >= checkThreshold) {
+  if (state.play.turn >= checkThreshold) {
     const board = state.board
-    const { isWinning, winningPath } = checkWinner(board, action.payload.lastMove, setting.winningCondition)
+    const { isWinning, winningPath } = checkWinner(board, action.payload.move, setting.winningCondition)
 
-    if (isWinning) return { ...state, isGameOver: true, winningPath }
+    if (isWinning) return { ...state, play: { ...state.play, isGameOver: true, winningPath } }
 
     const isPlayable = checkPlayable(board)
-    if (!isPlayable) return { ...state, isGameOver: true }
+    if (!isPlayable) return { ...state, play: { ...state.play, isGameOver: true } }
   }
   return state
 }
 
 export const handleNext = (state: GameState): GameState => {
-  const isX = !state.isX
-  const turn = state.turn + 1
-  return { ...state, isX, turn }
+  const logs = state.logs ? [...state.logs, state.play] : [state.play]
+  const turn = state.play.turn + 1
+  const isX = !state.play.isX
+  return { ...state, play: { ...state.play, turn, isX, move: null }, logs }
 }
