@@ -31,13 +31,13 @@ const traceDirection = (
 
 export const checkWinner = (
   board: string[][],
-  lastMove: Move,
+  move: Move,
   winningCondition: number
 ): {
   isWinning: boolean
   winningPath: Move[] | null
 } => {
-  const { row, col } = lastMove
+  const { row, col } = move
   const mark = board[row][col]
   if (!mark) return { isWinning: false, winningPath: null }
 
