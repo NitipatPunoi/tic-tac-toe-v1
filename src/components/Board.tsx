@@ -1,4 +1,4 @@
-import { Move, BoardType } from '../types'
+import { Move, BoardType } from './../types'
 
 type BoardProps = {
   board: BoardType

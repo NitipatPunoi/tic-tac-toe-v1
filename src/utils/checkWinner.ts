@@ -1,5 +1,5 @@
 import { isInBounds } from './isInBounds'
-import { Move, BoardType } from '../types'
+import { Move, BoardType } from './../types'
 
 const directions = Object.freeze([
   { dr: 0, dc: 1 }, // Horizontal

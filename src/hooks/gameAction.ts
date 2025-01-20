@@ -1,5 +1,5 @@
-import { Setting, PlayState, GameState, Action, ActionType, ActionPayload } from '../types'
-import { checkWinner, checkPlayable } from '../utils'
+import { Setting, PlayState, GameState, Action, ActionType, ActionPayload } from './../types'
+import { checkWinner, checkPlayable } from './../utils'
 
 export const initGameState = (setting: Setting): GameState => {
   const board = Array(setting.boardSize.rows)
