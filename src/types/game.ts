@@ -5,7 +5,7 @@ export type Move = {
   col: number
 }
 
-export type Board = string[][]
+export type BoardType = string[][]
 
 export type PlayState = {
   turn: number
@@ -17,7 +17,7 @@ export type PlayState = {
 
 export type GameState = {
   setting: Setting
-  board: Board
+  board: BoardType
   play: PlayState
   logs: PlayState[] | null
 }

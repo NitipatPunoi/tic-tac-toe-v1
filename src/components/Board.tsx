@@ -1,13 +1,13 @@
-import { Move } from '../types'
+import { Move, BoardType } from '../types'
 
 type BoardProps = {
-  board: string[][]
-  lastMove: Move | null
+  board: BoardType
+  move: Move | null
   winningPath: Move[] | null
   onClick: (rowIndex: number, colIndex: number) => void
 }
 
-export const Board: React.FC<BoardProps> = ({ board, lastMove, winningPath, onClick }) => {
+export const Board: React.FC<BoardProps> = ({ board, move, winningPath, onClick }) => {
   const isWinningPath = (row: number, col: number) =>
     winningPath !== null && winningPath.some((pos) => pos.row === row && pos.col === col)
   return (
@@ -20,7 +20,7 @@ export const Board: React.FC<BoardProps> = ({ board, lastMove, winningPath, onCl
               onClick={() => onClick(rowIndex, colIndex)}
               className={`flex items-center justify-center w-[50px] h-[50px] text-2xl font-lilita border bg-boardBackground border-boardBorder 
                 ${col !== null ? (col == 'X' ? 'x-mark' : 'o-mark') : 'cursor-pointer'} 
-                ${lastMove && lastMove.row === rowIndex && lastMove.col === colIndex && 'lastMove'}
+                ${move && move.row === rowIndex && move.col === colIndex && 'lastMove'}
                 ${isWinningPath(rowIndex, colIndex) && 'hilight'}`}
             >
               {col}

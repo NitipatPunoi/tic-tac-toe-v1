@@ -63,12 +63,7 @@ const PlayScreen = () => {
             play
           </span>
         </div>
-        <Board
-          board={state.board}
-          lastMove={state.play.move}
-          winningPath={state.play.winningPath}
-          onClick={handleClick}
-        />
+        <Board board={state.board} move={state.play.move} winningPath={state.play.winningPath} onClick={handleClick} />
       </div>
       <div className="grid grid-rows gap-6 w-2/3 md:w-1/2 lg:w-1/3 h-full mx-auto px-0 sm:px-5 md:px-10 py-10 text-center">
         <Button text="Reset" onClick={handleReset} />

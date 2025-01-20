@@ -1,5 +1,5 @@
 import { isInBounds } from './isInBounds'
-import { Move } from '../types'
+import { Move, BoardType } from '../types'
 
 const directions = Object.freeze([
   { dr: 0, dc: 1 }, // Horizontal
@@ -9,7 +9,7 @@ const directions = Object.freeze([
 ])
 
 const traceDirection = (
-  board: string[][],
+  board: BoardType,
   row: number,
   col: number,
   dr: number,
@@ -30,7 +30,7 @@ const traceDirection = (
 }
 
 export const checkWinner = (
-  board: string[][],
+  board: BoardType,
   move: Move,
   winningCondition: number
 ): {
