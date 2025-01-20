@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { SettingProvider } from './contexts'
+import { GameModeProvider } from './contexts'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
@@ -9,7 +10,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <SettingProvider>
-        <App />
+        <GameModeProvider>
+          <App />
+        </GameModeProvider>
       </SettingProvider>
     </BrowserRouter>
   </StrictMode>
