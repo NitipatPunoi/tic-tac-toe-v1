@@ -2,16 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Board } from './../../components/Board'
 import { Button, Modal } from './../../components/UIElement'
-import { useSettingContext } from '../../contexts'
+import { useSettingContext, useGameModeContext } from '../../contexts'
 import { useGameReducer } from '../../hooks'
-import { Move, ActionType } from './../../types'
-import { flushSync } from 'react-dom'
+import { Move, ActionType, GameModeType } from './../../types'
 
 const PlayScreen = () => {
+  const { gameMode } = useGameModeContext()
   const { setting } = useSettingContext()
   const { state, dispatch } = useGameReducer(setting)
   const [isModalOpen, setModalOpen] = useState(false)
   const stateRef = useRef(state)
+  const [isBotPlay, setIsBotPlay] = useState(false)
 
   useEffect(() => {
     stateRef.current = state
@@ -27,36 +28,57 @@ const PlayScreen = () => {
     }
   }, [state.play.isGameOver])
 
-  const handleCloseModal = () => {
-    setModalOpen(false)
-    handleReset()
-  }
-
-  const handleClick = (row: number, col: number) => {
+  const handleMove = (row: number, col: number) => {
     const move: Move = { row, col }
+    const isX: boolean = state.play.isX
     if (!state.play.isGameOver && !state.board[row][col]) {
-      flushSync(() => {
-        dispatch({
-          type: ActionType.Move,
-          payload: { move, isX: state.play.isX },
-        })
+      dispatch({
+        type: ActionType.Move,
+        payload: { setting, move, isX },
       })
-
-      flushSync(() => {
-        dispatch({
-          type: ActionType.Check,
-          payload: { setting, move },
-        })
-      })
-
       if (!stateRef.current.play.isGameOver) {
-        dispatch({ type: ActionType.Next })
+        gameMode === GameModeType.SinglePlayer && setIsBotPlay((prevIsBotPlay) => !prevIsBotPlay)
       }
     }
   }
 
+  const handleClick = (row: number, col: number) => {
+    if (isBotPlay) return
+    handleMove(row, col)
+  }
+
   const handleReset = () => {
-    dispatch({ type: ActionType.Reset, payload: { setting } })
+    setIsBotPlay(false)
+    dispatch({ type: ActionType.Reset, payload: { setting, move: null, isX: null } })
+  }
+
+  const handleCloseModal = () => {
+    setModalOpen(false)
+  }
+
+  const getRandomMove = (): { row: number; col: number } | null => {
+    const availableMoves: { row: number; col: number }[] = []
+
+    state.board.forEach((boardRow, row) => {
+      boardRow.forEach((cell, col) => {
+        if (cell === null) {
+          availableMoves.push({ row, col })
+        }
+      })
+    })
+
+    if (availableMoves.length === 0) {
+      return null
+    }
+
+    const randomIndex = Math.floor(Math.random() * availableMoves.length)
+    return availableMoves[randomIndex]
+  }
+
+  if (isBotPlay) {
+    // Bot Make Decision
+    const randMove = getRandomMove()
+    if (randMove !== null) handleMove(randMove.row, randMove.col)
   }
 
   return (
@@ -85,7 +107,7 @@ const PlayScreen = () => {
       <Modal open={isModalOpen} onClose={handleCloseModal}>
         <div>
           <h2 className="text-3xl font-bold">Game Over!</h2>
-          <p className="mt-4">win is {`${state.play.isX ? 'X' : 'O'}`}</p>
+          <p className="mt-4">win is {`${state.play.isX ? 'X' : 'O'} ${state.play.turn}`}</p>
           <div className="mt-4 flex justify-around">
             <Button text="Close" onClick={handleCloseModal} />
           </div>
