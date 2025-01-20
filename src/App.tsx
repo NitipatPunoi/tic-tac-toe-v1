@@ -1,7 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { HomeScreen, PlayScreen, SettingScreen, CreditScreen } from './pages'
 import { Header, Footer } from './components/layouts'
+import { HomeScreen, PlayScreen, SettingScreen, CreditScreen } from './pages'
 import './assets/global.css'
 
 const App = () => {
