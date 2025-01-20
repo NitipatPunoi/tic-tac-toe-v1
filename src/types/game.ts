@@ -5,13 +5,21 @@ export type Move = {
   col: number
 }
 
-export type GameState = {
-  board: string[][]
+export type BoardState = string[][]
+
+export type PlayState = {
   turn: number
   isX: boolean
   isGameOver: boolean
-  lastMove: Move | null
+  move: Move | null
   winningPath: Move[] | null
+}
+
+export type GameState = {
+  setting: Setting
+  board: BoardState
+  play: PlayState
+  logs: PlayState[] | null
 }
 
 export enum ActionType {
@@ -19,14 +27,14 @@ export enum ActionType {
   Move = 'MOVE',
   Check = 'CHECK',
   Next = 'NEXT',
-  End = 'END',
 }
+
 export type Action<ActionType extends string, Payload = undefined> = Payload extends undefined
   ? { type: ActionType }
   : { type: ActionType; payload: Payload }
 
 export type GameAction =
   | Action<ActionType.Reset, { setting: Setting }>
-  | Action<ActionType.Move, { lastMove: Move; isX: boolean }>
-  | Action<ActionType.Check, { setting: Setting; lastMove: Move }>
+  | Action<ActionType.Move, { move: Move; isX: boolean }>
+  | Action<ActionType.Check, { setting: Setting; move: Move }>
   | Action<ActionType.Next>
