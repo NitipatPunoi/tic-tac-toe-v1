@@ -1,5 +1,5 @@
 import { Setting, PlayState, GameState, Action, ActionType, ActionPayload } from './../types'
-import { checkWinner, checkPlayable } from './../utils'
+import { checkWinner, checkPlayable, getCheckThreshold } from './../utils'
 
 export const initGameState = (setting: Setting): GameState => {
   const board = Array(setting.boardSize.rows)
@@ -36,7 +36,7 @@ export const actionCheck = (state: GameState, action: Action<ActionType.Move, Ac
   if (!setting || !move) {
     return state
   }
-  const checkThreshold = 2 * setting.winningCondition - 1
+  const checkThreshold = getCheckThreshold(setting.winningCondition)
   if (state.play.turn >= checkThreshold) {
     const board = state.board
     const { isWinning, winningPath } = checkWinner(board, move, setting.winningCondition)
