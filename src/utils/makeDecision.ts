@@ -1,6 +1,7 @@
-import { BoardType, GameState, Move, PlayState } from '../types'
+import { BoardType, GameState, Move } from '../types'
 import { checkWinner } from './checkWinner'
 import { getCheckThreshold } from './getCheckThreshold'
+import { getStepsBack } from './getStepsBack'
 
 const directions = Object.freeze([
   { dr: -1, dc: -1 },
@@ -29,14 +30,11 @@ const getAvailableMoves = (board: BoardType): Move[] => {
   return availableMoves
 }
 
-const getStepsBackMove = (logs: PlayState[] | null, stepsBack: number = 1): Move | null =>
-  logs && logs.length >= stepsBack ? logs[logs.length - stepsBack].move : null
-
 const toNearby = (state: GameState | null, availableMoves: Move[], stepsBack: number = 2): Move | null => {
   if (!state?.logs) {
     return null
   }
-  const stepsBackMove = getStepsBackMove(state.logs, stepsBack)
+  const stepsBackMove = getStepsBack(state.logs, stepsBack)
 
   if (!stepsBackMove) {
     return null
