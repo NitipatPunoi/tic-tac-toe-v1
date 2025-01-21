@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { SETTING_STORAGE_KEY, DEFAULT_SETTING } from './../config'
-import { Setting } from './../types'
-import { getFromLocalStorage, saveToLocalStorage } from './../utils'
+import { SETTING_STORAGE_KEY, DEFAULT_SETTING } from '../config'
+import { Setting } from '../types'
+import { getFromLocalStorage, saveToLocalStorage } from '../utils'
 
 type SettingContextType = {
   setting: Setting

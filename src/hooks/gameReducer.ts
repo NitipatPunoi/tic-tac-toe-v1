@@ -1,4 +1,4 @@
-import { GameState, GameAction, ActionType } from './../types'
+import { GameState, GameAction, ActionType } from '../types'
 import { actionReset, actionMove, actionCheck, actionLog, actionNext } from './gameAction'
 
 export const gameReducer = (state: GameState, action: GameAction): GameState => {

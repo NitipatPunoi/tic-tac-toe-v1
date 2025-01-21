@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Button } from './UIElement/Button'
-import { useGameModeContext } from './../contexts'
-import { GameModeType } from './../types'
+import { useGameModeContext } from '../contexts'
+import { GameModeType } from '../types'
 
 export const MainMenu = () => {
   const { handleSetGameMode } = useGameModeContext()

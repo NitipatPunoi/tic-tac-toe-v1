@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Button } from './../../components/UIElement'
+import { Button } from '../../components/UIElement'
 
 const CreditScreen = () => {
   return (

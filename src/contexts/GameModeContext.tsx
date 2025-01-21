@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
-import { GameMode, GameModeType } from './../types'
-import { getFromLocalStorage, saveToLocalStorage } from './../utils'
-import { GAME_MODE_STORAGE_KEY } from './../config/config'
+import { GameMode, GameModeType } from '../types'
+import { getFromLocalStorage, saveToLocalStorage } from '../utils'
+import { GAME_MODE_STORAGE_KEY } from '../config/config'
 
 type GameModeContextType = {
   gameMode: GameMode

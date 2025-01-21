@@ -1,8 +1,8 @@
 import { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Button } from './../../components/UIElement'
-import { useSettingContext } from './../../contexts'
-import { Setting } from './../../types'
+import { Button } from '../../components/UIElement'
+import { useSettingContext } from '../../contexts'
+import { Setting } from '../../types'
 
 const Settingcreen = () => {
   const { setting, handleSetPartialSetting, handleResetDefault } = useSettingContext()
