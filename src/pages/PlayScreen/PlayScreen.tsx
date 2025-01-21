@@ -58,8 +58,9 @@ const PlayScreen = () => {
   }
 
   if (isBotPlay) {
-    const botDecision = makeDecision(state)
-    handleMove(botDecision.row, botDecision.col)
+    const decisionLevel = 2
+    const botDecision = makeDecision(state, decisionLevel)
+    botDecision && handleMove(botDecision.row, botDecision.col)
   }
 
   return (
