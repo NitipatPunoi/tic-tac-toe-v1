@@ -89,7 +89,7 @@ const PlayScreen = () => {
       <Modal open={isModalOpen} onClose={handleCloseModal}>
         <div>
           <h2 className="text-3xl font-bold">Game Over!</h2>
-          <p className="mt-4">win is {`${state.play.isX ? 'X' : 'O'} ${state.play.turn}`}</p>
+          <p className="mt-4">{state.play.winningPath ? `win is ${state.play.isX ? 'X' : 'O'}` : 'draw'}</p>
           <div className="mt-4 flex justify-around">
             <Button text="Close" onClick={handleCloseModal} />
           </div>
