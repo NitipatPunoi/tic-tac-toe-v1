@@ -1,6 +1,7 @@
 export const SETTING_STORAGE_KEY = 'setting'
+export const GAME_MODE_STORAGE_KEY = 'game-mode'
 
 export const DEFAULT_SETTING = Object.freeze({
-    boardSize: Object.freeze({ rows: 3, cols: 3 }),
-    winningCondition: 3,
-  })
+  boardSize: Object.freeze({ rows: 3, cols: 3 }),
+  winningCondition: 3,
+})
