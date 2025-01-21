@@ -32,11 +32,11 @@ const getAvailableMoves = (board: BoardType): Move[] => {
 const getStepsBackMove = (logs: PlayState[] | null, stepsBack: number = 1): Move | null =>
   logs && logs.length >= stepsBack ? logs[logs.length - stepsBack].move : null
 
-const toNearby = (state: GameState | null, availableMoves: Move[]): Move | null => {
+const toNearby = (state: GameState | null, availableMoves: Move[], stepsBack: number = 2): Move | null => {
   if (!state?.logs) {
     return null
   }
-  const stepsBackMove = getStepsBackMove(state.logs, 2)
+  const stepsBackMove = getStepsBackMove(state.logs, stepsBack)
 
   if (!stepsBackMove) {
     return null
