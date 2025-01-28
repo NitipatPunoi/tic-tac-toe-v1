@@ -13,9 +13,10 @@ export default {
         btnPrimaryActive: '#163172',
         boardBorder: '#14279b',
         boardBackground: '#ffffff',
-        boardBorderMark: '#f3f8ff',
-        boardBorderHilight: '#caf7e3',
-        boardBorderLastMove: '#deecff',
+        boardCellHover: '#dddddd',
+        boardMark: '#f3f8ff',
+        boardHilight: '#caf7e3',
+        boardLastMove: '#deecff',
       },
       fontFamily: {
         lilita: ['Lilita One', 'cursive'],

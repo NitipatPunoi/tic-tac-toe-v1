@@ -31,6 +31,9 @@ input[type='number'] {
   @apply bg-btnPrimaryActive;
 }
 
+.board {
+  @apply transition duration-500 ease-in-out;
+}
 .x-mark {
   @apply text-textLightBlue;
 }
@@ -39,12 +42,18 @@ input[type='number'] {
 }
 .board .x-mark,
 .board .o-mark {
-  @apply bg-boardBorderMark;
+  @apply bg-boardMark;
+}
+.board .non-mark {
+  @apply cursor-pointer transition duration-500 ease-in-out;
+}
+.board .non-mark:hover {
+  @apply bg-boardCellHover cursor-pointer;
 }
 .board .hilight,
 .board .hilight.lastMove {
-  @apply bg-boardBorderHilight;
+  @apply bg-boardHilight;
 }
 .board .lastMove {
-  @apply bg-boardBorderLastMove;
+  @apply bg-boardLastMove;
 }
