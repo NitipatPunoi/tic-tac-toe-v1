@@ -19,10 +19,14 @@ const SettingContext = createContext<SettingContextType>({
 
 export const SettingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [setting, setSetting] = useState<Setting>(getDefaultSetting())
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const localSetting = getFromLocalStorage<Setting>(SETTING_STORAGE_KEY)
-    localSetting && setSetting(localSetting)
+    if (localSetting) {
+      setSetting(localSetting)
+    }
+    setIsLoading(false)
   }, [])
 
   const handleSetPartialSetting = (partialSetting: Partial<Setting>) => {
@@ -45,7 +49,7 @@ export const SettingProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   return (
     <SettingContext.Provider value={{ setting, handleSetPartialSetting, handleResetDefault }}>
-      {children}
+      {isLoading ? <div>Loading...</div> : children}
     </SettingContext.Provider>
   )
 }
