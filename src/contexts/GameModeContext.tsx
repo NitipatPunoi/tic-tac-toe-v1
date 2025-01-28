@@ -2,7 +2,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 import { GameMode, GameModeType } from '../types'
 import { getFromLocalStorage, saveToLocalStorage } from '../utils'
 import { GAME_MODE_STORAGE_KEY } from '../config/config'
-import Loading from '../components/Loading'
+import Loading from '../components/SpinnerLoader'
 
 type GameModeContextType = {
   gameMode: GameMode

@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { SETTING_STORAGE_KEY, DEFAULT_SETTING } from '../config'
 import { Setting } from '../types'
 import { getFromLocalStorage, saveToLocalStorage } from '../utils'
-import Loading from '../components/Loading'
+import Loading from '../components/SpinnerLoader'
 
 type SettingContextType = {
   setting: Setting
