@@ -1,16 +1,16 @@
 import { GameState, GameAction, ActionType } from '../types'
-import { actionReset, actionMove, actionCheck, actionLog, actionNext } from './gameAction'
+import { resetGameState, makeMove, checkResultWithThreshold, logMoved, nextTurn } from './gameAction'
 
 export const gameReducer = (state: GameState, action: GameAction): GameState => {
   switch (action.type) {
-    case ActionType.Reset:
-      return actionReset(state, action)
-    case ActionType.Move:
-      let gameState = state
-      gameState = actionMove(gameState, action)
-      gameState = actionCheck(gameState, action)
-      gameState = actionLog(gameState)
-      return !gameState.play.isGameOver ? actionNext(gameState) : gameState
+    case ActionType.RESET:
+      return resetGameState(state.setting, state.players)
+    case ActionType.MOVE:
+      let newStage = { ...state }
+      newStage = makeMove(newStage, action)
+      newStage.result = checkResultWithThreshold(newStage, action)
+      newStage.logs = logMoved(newStage, action)
+      return !newStage.result.isGameOver ? nextTurn(newStage) : newStage
     default:
       return state
   }

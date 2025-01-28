@@ -1,10 +1,11 @@
 import { isInBounds } from './isInBounds'
-import { checkWinner } from './checkWinner'
-import { checkPlayable } from './checkPlayable'
-import { getCheckThreshold } from './getCheckThreshold'
-import { makeDecision } from './makeDecision'
+import { findWinner } from './findWinner'
+import { isPlayable } from './isPlayable'
+import { getCheckResultThreshold } from './getCheckResultThreshold'
+import { getNextSymbol } from './getNextSymbol'
 import { getStepsBack } from './getStepsBack'
+import { makeDecision } from './makeDecision'
 import { getFromLocalStorage, saveToLocalStorage } from './localStorageHelper'
 
-export { isInBounds, checkWinner, checkPlayable, makeDecision, getCheckThreshold, getStepsBack }
+export { isInBounds, findWinner, isPlayable, getCheckResultThreshold, getNextSymbol, getStepsBack, makeDecision }
 export { getFromLocalStorage, saveToLocalStorage }

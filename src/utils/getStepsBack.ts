@@ -1,4 +1,4 @@
-import { Move, PlayState } from '../types'
+import { Move, Log } from '../types'
 
-export const getStepsBack = (logs: PlayState[] | null, stepsBack: number = 1): Move | null =>
-  logs && logs.length >= stepsBack ? logs[logs.length - stepsBack].move : null
+export const getStepsBack = (logs: Log[] | undefined, stepsBack: number = 1): Move | null =>
+  logs !== undefined && logs.length >= stepsBack ? logs[logs.length - stepsBack].move : null

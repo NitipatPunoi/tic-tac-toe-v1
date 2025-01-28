@@ -1,9 +1,9 @@
 import { useReducer } from 'react'
 import { gameReducer } from './gameReducer'
-import { initGameState } from './gameAction'
-import { Setting } from '../types'
+import { initialGameState } from './gameAction'
+import { Setting, Player } from '../types'
 
-export const useGameReducer = (setting: Setting) => {
-  const [state, dispatch] = useReducer(gameReducer, initGameState(setting))
+export const useGameReducer = (setting: Setting, players: Player[]) => {
+  const [state, dispatch] = useReducer(gameReducer, initialGameState(setting, players))
   return { state, dispatch }
 }

@@ -1,5 +1,6 @@
 import { getStepsBack } from '../utils'
 import { GameState } from '../types'
+import { BoardRow } from './BoardRow'
 
 type BoardProps = {
   state: GameState
@@ -7,31 +8,28 @@ type BoardProps = {
 }
 
 export const Board: React.FC<BoardProps> = ({ state, onClick }) => {
-  const isWinningPath = (row: number, col: number) =>
-    state.play.winningPath !== null && state.play.winningPath.some((pos) => pos.row === row && pos.col === col)
+  const isWinningPath = (row: number, col: number): boolean => {
+    return state.result.winningPath !== undefined
+      ? state.result.winningPath.some((pos) => pos.row === row && pos.col === col)
+      : false
+  }
 
-  const isLastMove = (row: number, col: number): string => {
+  const isLastMove = (row: number, col: number): boolean => {
     const lastMove = getStepsBack(state.logs)
-    return lastMove && lastMove.row === row && lastMove.col === col ? 'lastMove' : ''
+    return lastMove ? lastMove.row === row && lastMove.col === col : false
   }
 
   return (
     <div className="board select-none">
-      {state.board.map((boardRow, row) => (
-        <div key={row} className="flex flex-row items-center justify-center">
-          {boardRow.map((cell, col) => (
-            <div
-              key={col}
-              onClick={() => onClick(row, col)}
-              className={`flex items-center justify-center w-[50px] h-[50px] text-2xl font-lilita border bg-boardBackground border-boardBorder 
-                ${cell !== null ? (cell == 'X' ? 'x-mark' : 'o-mark') : 'cursor-pointer'} 
-                ${isLastMove(row, col)}  
-                ${isWinningPath(row, col) && 'hilight'}`}
-            >
-              {cell}
-            </div>
-          ))}
-        </div>
+      {state.board.map((cellsRow, row) => (
+        <BoardRow
+          key={row}
+          row={row}
+          boardRow={cellsRow}
+          onClick={onClick}
+          isWinningPath={isWinningPath}
+          isLastMove={isLastMove}
+        />
       ))}
     </div>
   )

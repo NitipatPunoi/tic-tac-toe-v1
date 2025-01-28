@@ -1,3 +1,4 @@
+import { Player } from './player'
 import { Setting } from './setting'
 
 export type Move = {
@@ -5,40 +6,38 @@ export type Move = {
   col: number
 }
 
-export type BoardType = string[][]
+export type Board = string[][]
 
-export type PlayState = {
-  turn: number
-  isX: boolean
+export type Turn = {
+  number: number
+  symbol: string
+}
+
+export type Log = Turn & {
+  move: Move
+}
+
+export type Result = {
   isGameOver: boolean
-  move: Move | null
-  winningPath: Move[] | null
+  winningPath?: Move[]
 }
 
 export type GameState = {
   setting: Setting
-  board: BoardType
-  play: PlayState
-  logs: PlayState[] | null
+  players: Player[]
+  board: Board
+  turn: Turn
+  logs?: Log[]
+  result: Result
 }
 
 export enum ActionType {
-  Reset = 'RESET',
-  Move = 'MOVE',
-  Check = 'CHECK',
-  Next = 'NEXT',
-  MoveCheck = 'MoveCheck',
+  RESET = 'RESET',
+  MOVE = 'MOVE',
 }
 
-export type Action<ActionType extends string, Payload = undefined> = Payload extends undefined
-  ? { type: ActionType }
-  : { type: ActionType; payload: Payload }
+export type Action<T extends ActionType, P = undefined> = P extends undefined ? { type: T } : { type: T; payload: P }
 
-export type ActionPayload = { setting: Setting | null; move: Move | null; isX: boolean | null }
+export type MovePayload = { move: Move; symbol: string }
 
-export type GameAction =
-  | Action<ActionType.Reset, ActionPayload>
-  | Action<ActionType.Move, ActionPayload>
-  | Action<ActionType.Check, ActionPayload>
-  | Action<ActionType.Next>
-  | Action<ActionType.MoveCheck, ActionPayload>
+export type GameAction = Action<ActionType.RESET> | Action<ActionType.MOVE, MovePayload>

@@ -4,42 +4,57 @@ import { Board } from '../../components/Board'
 import { Button, Modal } from '../../components/UIElement'
 import { useSettingContext, useGameModeContext } from '../../contexts'
 import { useGameReducer } from '../../hooks'
-import { Move, ActionType, GameModeType } from '../../types'
+import { Move, ActionType, GameModeType, Player } from '../../types'
 import { makeDecision } from '../../utils'
 
 const PlayScreen = () => {
   const { gameMode } = useGameModeContext()
   const { setting } = useSettingContext()
-  const { state, dispatch } = useGameReducer(setting)
+  const players: Player[] = [{ symbol: 'X' }, { symbol: 'O' }]
+  const { state, dispatch } = useGameReducer(setting, players)
   const [isModalOpen, setModalOpen] = useState(false)
-  const stateRef = useRef(state)
   const [isBotPlay, setIsBotPlay] = useState(false)
+  const stateRef = useRef(state)
 
   useEffect(() => {
     stateRef.current = state
   }, [state])
 
   useEffect(() => {
-    handleReset()
-  }, [setting])
+    if (state.result.isGameOver) {
+      setTimeout(() => {
+        setModalOpen(true)
+      }, 300)
+    }
+  }, [state.result.isGameOver])
 
   useEffect(() => {
-    if (state.play.isGameOver) {
-      setModalOpen(true)
+    if (isBotPlay) {
+      const decisionLevel = 2
+      const botDecision = makeDecision(state, decisionLevel)
+
+      const min = 300
+      const max = 800
+      const timeout = Math.floor(Math.random() * (max - min)) + min
+
+      setTimeout(() => {
+        botDecision && handleMove(botDecision.row, botDecision.col)
+      }, timeout)
     }
-  }, [state.play.isGameOver])
+  }, [isBotPlay])
 
   const handleMove = (row: number, col: number) => {
     const move: Move = { row, col }
-    const isX: boolean = state.play.isX
-    if (!state.play.isGameOver && !state.board[row][col]) {
+    const symbol: string = state.turn.symbol
+
+    if (!state.result.isGameOver && !state.board[row][col]) {
       dispatch({
-        type: ActionType.Move,
-        payload: { setting, move, isX },
+        type: ActionType.MOVE,
+        payload: { move, symbol },
       })
-      if (!stateRef.current.play.isGameOver) {
-        gameMode === GameModeType.SinglePlayer && setIsBotPlay((prevIsBotPlay) => !prevIsBotPlay)
-      }
+
+      if (!stateRef.current.result.isGameOver && gameMode === GameModeType.SinglePlayer)
+        setIsBotPlay((prevIsBotPlay) => !prevIsBotPlay)
     }
   }
 
@@ -50,17 +65,11 @@ const PlayScreen = () => {
 
   const handleReset = () => {
     setIsBotPlay(false)
-    dispatch({ type: ActionType.Reset, payload: { setting, move: null, isX: null } })
+    dispatch({ type: ActionType.RESET })
   }
 
   const handleCloseModal = () => {
     setModalOpen(false)
-  }
-
-  if (isBotPlay) {
-    const decisionLevel = 2
-    const botDecision = makeDecision(state, decisionLevel)
-    botDecision && handleMove(botDecision.row, botDecision.col)
   }
 
   return (
@@ -71,13 +80,12 @@ const PlayScreen = () => {
       </div>
       <div className="w-fit mx-auto">
         <div className="flex flex-row justify-between">
-          <span>turn {`${state.play.turn}`}</span>
+          <span>turn {`${state.turn.number}`}</span>
           <span>
-            <span className={`${state.play.isX ? 'x-mark' : 'o-mark'} px-1`}>{`${state.play.isX ? 'X' : 'O'}`}</span>
+            <span className={`${state.turn.symbol.toLowerCase() + '-mark'} px-1`}>{`${state.turn.symbol}`}</span>
             play
           </span>
         </div>
-        {/* <Board board={state.board} move={state.play.move} winningPath={state.play.winningPath} onClick={handleClick} /> */}
         <Board state={state} onClick={handleClick} />
       </div>
       <div className="grid grid-rows gap-6 w-2/3 md:w-1/2 lg:w-1/3 h-full mx-auto px-0 sm:px-5 md:px-10 py-10 text-center">
@@ -90,7 +98,7 @@ const PlayScreen = () => {
       <Modal open={isModalOpen} onClose={handleCloseModal}>
         <div>
           <h2 className="text-3xl font-bold">Game Over!</h2>
-          <p className="mt-4">{state.play.winningPath ? `win is ${state.play.isX ? 'X' : 'O'}` : 'draw'}</p>
+          <p className="mt-4">{state.result.winningPath ? `win is ${state.turn.symbol}` : 'draw'}</p>
           <div className="mt-4 flex justify-around">
             <Button text="Close" onClick={handleCloseModal} />
           </div>

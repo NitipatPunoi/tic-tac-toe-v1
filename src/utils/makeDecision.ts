@@ -1,6 +1,7 @@
-import { BoardType, GameState, Move } from '../types'
-import { checkWinner } from './checkWinner'
-import { getCheckThreshold } from './getCheckThreshold'
+import { Board, GameState, Move } from '../types'
+import { findWinner } from './findWinner'
+import { getCheckResultThreshold } from './getCheckResultThreshold'
+import { getNextSymbol } from './getNextSymbol'
 import { getStepsBack } from './getStepsBack'
 
 const directions = Object.freeze([
@@ -14,31 +15,28 @@ const directions = Object.freeze([
   { dr: 1, dc: 1 },
 ])
 
-const getSimulatedState = (state: GameState): GameState => {
-  return JSON.parse(JSON.stringify(state))
+const cloneState = (state: GameState): GameState => JSON.parse(JSON.stringify(state))
+
+const getAvailableMoves = (board: Board): Move[] => {
+  return board
+    .flatMap((cellsRow, row) => cellsRow.map((cell, col) => (cell === null ? { row, col } : null)))
+    .filter((move): move is Move => move !== null)
 }
 
-const getAvailableMoves = (board: BoardType): Move[] => {
-  const availableMoves: Move[] = []
-  board.forEach((item, row) => {
-    item.forEach((cell, col) => {
-      if (cell === null) {
-        availableMoves.push({ row, col })
-      }
-    })
-  })
-  return availableMoves
+const getRandomMove = (availableMoves: Move[]): Move => {
+  const randomIndex = Math.floor(Math.random() * availableMoves.length)
+  return availableMoves[randomIndex]
 }
 
-const toNearby = (state: GameState | null, availableMoves: Move[], stepsBack: number = 2): Move | null => {
-  if (!state?.logs) {
-    return null
-  }
+const filterNonEdgeMoves = (board: Board, availableMoves: Move[]): Move[] => {
+  const rows = board.length
+  const cols = board[0].length
+  return availableMoves.filter(({ row, col }) => row > 0 && row < rows - 1 && col > 0 && col < cols - 1)
+}
+
+const getNearbyMove = (state: GameState, availableMoves: Move[], stepsBack: number = 2): Move | null => {
   const stepsBackMove = getStepsBack(state.logs, stepsBack)
-
-  if (!stepsBackMove) {
-    return null
-  }
+  if (!stepsBackMove) return null
 
   for (const { dr, dc } of directions) {
     const nearbyMove = {
@@ -46,71 +44,31 @@ const toNearby = (state: GameState | null, availableMoves: Move[], stepsBack: nu
       col: stepsBackMove.col + dc,
     }
 
-    if (availableMoves.some((move) => move.row === nearbyMove.row && move.col === nearbyMove.col)) {
-      return nearbyMove
-    }
+    const isAvailable = availableMoves.some((move) => move.row === nearbyMove.row && move.col === nearbyMove.col)
+    if (isAvailable) return nearbyMove
   }
 
   return null
 }
 
-const toRandom = (availableMoves: Move[]): Move => {
-  const randomIndex = Math.floor(Math.random() * availableMoves.length)
-  return availableMoves[randomIndex]
-}
-
-const toRandomNonEdge = (board: BoardType, availableMoves: Move[]): Move | null => {
-  const rowsBounds = board.length
-  const colsBounds = board[0].length
-
-  const nonEdgeMoves = availableMoves.filter(({ row, col }) => {
-    return row > 0 && row < rowsBounds - 1 && col > 0 && col < colsBounds - 1
-  })
-
-  return nonEdgeMoves.length !== 0 ? toRandom(nonEdgeMoves) : null
-}
-
-const toWin = (state: GameState, availableMoves: Move[], turnToPredict: number): Move | null => {
+const getStrategyMove = (
+  state: GameState,
+  availableMoves: Move[],
+  symbol: string,
+  turnToPredict: number
+): Move | null => {
   for (const move of availableMoves) {
-    const simulatedState = getSimulatedState(state)
-    simulatedState.board[move.row][move.col] = simulatedState.play.isX ? 'X' : 'O'
+    const simulatedState = cloneState(state)
+    simulatedState.board[move.row][move.col] = symbol
 
     const winningCondition = simulatedState.setting.winningCondition - turnToPredict
-    const { isWinning } = checkWinner(simulatedState.board, move, winningCondition)
+    const { isFound } = findWinner(simulatedState.board, move, winningCondition)
 
-    if (isWinning) {
+    if (isFound) {
       if (turnToPredict > 0) {
         const newMoves = getAvailableMoves(simulatedState.board)
-        const toWinMove = toWin(simulatedState, newMoves, turnToPredict - 1)
-        if (toWinMove) {
-          return move
-        }
-      } else {
-        return move
-      }
-    }
-  }
-
-  return null
-}
-
-const toBlock = (state: GameState, availableMoves: Move[], turnToPredict: number): Move | null => {
-  for (const move of availableMoves) {
-    const simulatedState = getSimulatedState(state)
-    simulatedState.play.isX = !simulatedState.play.isX
-    simulatedState.board[move.row][move.col] = simulatedState.play.isX ? 'X' : 'O'
-
-    const winningCondition = simulatedState.setting.winningCondition - turnToPredict
-    const { isWinning } = checkWinner(simulatedState.board, move, winningCondition)
-
-    if (isWinning) {
-      if (turnToPredict > 0) {
-        const newMoves = getAvailableMoves(simulatedState.board)
-        simulatedState.play.isX = !simulatedState.play.isX
-        const toBlockMove = toBlock(simulatedState, newMoves, turnToPredict - 1)
-        if (toBlockMove) {
-          return move
-        }
+        const nextMove = getStrategyMove(simulatedState, newMoves, symbol, turnToPredict - 1)
+        if (nextMove) return move
       } else {
         return move
       }
@@ -122,40 +80,30 @@ const toBlock = (state: GameState, availableMoves: Move[], turnToPredict: number
 
 export const makeDecision = (state: GameState, decisionLevel: number = 0): Move | null => {
   const availableMoves = getAvailableMoves(state.board)
+  if (availableMoves.length === 0) return null
 
-  if (availableMoves.length === 0) {
-    return null
-  }
+  const winningSymbol = state.turn.symbol
+  const blockingSymbol = getNextSymbol(state.players, state.turn.symbol)
 
   for (let level = 0; level <= decisionLevel; level++) {
-    const checkThreshold = getCheckThreshold(state.setting.winningCondition, level)
+    const threshold = getCheckResultThreshold(state.setting.winningCondition, level)
+    if (state.turn.number < threshold) continue
 
-    if (state.play.turn >= checkThreshold) {
-      const toWinMove = toWin(state, availableMoves, level)
-      if (toWinMove) {
-        return toWinMove
-      }
-
-      const toBlockMove = toBlock(state, availableMoves, level)
-      if (toBlockMove) {
-        return toBlockMove
-      }
+    for (const symbol of [winningSymbol, blockingSymbol]) {
+      const strategyMove = getStrategyMove(state, availableMoves, symbol, level)
+      if (strategyMove) return strategyMove
     }
   }
 
   if (decisionLevel >= 2) {
-    const toNearbyMove = toNearby(state, availableMoves)
-    if (toNearbyMove) {
-      return toNearbyMove
-    }
+    const nearbyMove = getNearbyMove(state, availableMoves)
+    if (nearbyMove) return nearbyMove
   }
 
   if (decisionLevel >= 1) {
-    const toRandomNonEdgeMove = toRandomNonEdge(state.board, availableMoves)
-    if (toRandomNonEdgeMove) {
-      return toRandomNonEdgeMove
-    }
+    const nonEdgeMoves = filterNonEdgeMoves(state.board, availableMoves)
+    if (nonEdgeMoves.length > 0) return getRandomMove(nonEdgeMoves)
   }
 
-  return toRandom(availableMoves)
+  return getRandomMove(availableMoves)
 }
