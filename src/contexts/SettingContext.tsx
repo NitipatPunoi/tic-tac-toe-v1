@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { SETTING_STORAGE_KEY, DEFAULT_SETTING } from '../config'
 import { Setting } from '../types'
 import { getFromLocalStorage, saveToLocalStorage } from '../utils'
+import Loading from '../components/Loading'
 
 type SettingContextType = {
   setting: Setting
@@ -49,7 +50,7 @@ export const SettingProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   return (
     <SettingContext.Provider value={{ setting, handleSetPartialSetting, handleResetDefault }}>
-      {isLoading ? <div>Loading...</div> : children}
+      {isLoading ? <Loading /> : children}
     </SettingContext.Provider>
   )
 }

@@ -2,6 +2,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 import { GameMode, GameModeType } from '../types'
 import { getFromLocalStorage, saveToLocalStorage } from '../utils'
 import { GAME_MODE_STORAGE_KEY } from '../config/config'
+import Loading from '../components/Loading'
 
 type GameModeContextType = {
   gameMode: GameMode
@@ -14,10 +15,14 @@ const GameModeContext = createContext<GameModeContextType>({
 
 export const GameModeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [gameMode, setGameMode] = useState<GameMode>(GameModeType.Default)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const localGameMode = getFromLocalStorage<GameModeType>(GAME_MODE_STORAGE_KEY)
-    localGameMode && setGameMode(localGameMode)
+    if (localGameMode) {
+      setGameMode(localGameMode)
+    }
+    setIsLoading(false)
   }, [])
 
   const handleSetGameMode = (newGameMode: GameModeType) => {
@@ -27,7 +32,11 @@ export const GameModeProvider: React.FC<{ children: ReactNode }> = ({ children }
     })
   }
 
-  return <GameModeContext.Provider value={{ gameMode, handleSetGameMode }}>{children}</GameModeContext.Provider>
+  return (
+    <GameModeContext.Provider value={{ gameMode, handleSetGameMode }}>
+      {isLoading ? <Loading /> : children}
+    </GameModeContext.Provider>
+  )
 }
 
 export const useGameModeContext = () => useContext(GameModeContext)
